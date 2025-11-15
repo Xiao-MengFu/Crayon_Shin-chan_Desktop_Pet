@@ -4,14 +4,20 @@ import threading
 import requests
 import pygame
 from functools import partial
+from dotenv import load_dotenv 
 from openai import OpenAI
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtCore import Qt, QTimer, QPoint
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton, QMessageBox, QLabel, QScrollArea, QSizePolicy
+from config import BASE_URL, API_KEY, MODEL
 
 # 设置Qt插件路径
+load_dotenv()
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = r'./.venv/Lib/site-packages/PyQt5/Qt5/plugins'
+# 设置OpenAI环境变量
+os.environ['OPENAI_API_BASE'] = BASE_URL
+os.environ['OPENAI_API_SECRET'] = API_KEY
 
 ##########桌面宠物+系统托盘模块##########
 
@@ -71,27 +77,6 @@ class Qt_pet(QtWidgets.QWidget):
                         return True
         QtWidgets.QMessageBox.warning(None, "警告", "没有找到配置文件哦~", QtWidgets.QMessageBox.StandardButton.Ok)
         return False
-        # conf_dirs = ["桌面宠物素材/"]
-        # for conf_dir in conf_dirs:
-        #     if os.path.exists(conf_dir) and os.path.isdir(conf_dir):
-        #         self.conf_dir = conf_dir
-        #         # 遍历 conf_dir 目录下的所有文件和子目录
-        #         for root, dirs, files in os.walk(self.conf_dir):
-        #             if root in conf_dirs:
-        #                 for sub_dir in dirs:
-        #                     # 遍历 sub_dir 目录及其子目录
-        #                     for sub_root, sub_dirs, sub_files in os.walk(os.path.join(root, sub_dir)):
-        #                         if sub_root == os.path.join(root, sub_dir) and len(sub_files) > 0:
-        #                             try:
-        #                                 # 按数字排序
-        #                                 sub_files.sort(key=lambda x: int(x.split(sep='.', maxsplit=1)[0]))
-        #                             except ValueError:
-        #                                 # 按字母排序
-        #                                 sub_files.sort(key=lambda x: x.split(sep='.', maxsplit=1)[0])
-        #                             self.dir2img.update({sub_root: sub_files})
-        #                     return True
-        # QtWidgets.QMessageBox.warning(None, "警告", "没有找到配置文件哦~", QtWidgets.QMessageBox.StandardButton.Ok)
-        # return False
 
     def windowinit(self):
         screen_rect = QApplication.desktop().availableGeometry()
@@ -278,9 +263,9 @@ def check_internet_connection():
     except requests.ConnectionError:
         return False
 
-api_key = "sk-xxxxxxxxxx"  # 请替换为你的实际API密钥
-llm_name = "Qwen/Qwen3-8B"
-base_url = "https://api.siliconflow.cn/v1"
+api_key = API_KEY
+llm_name = MODEL
+base_url = BASE_URL
 client = OpenAI(api_key=api_key, base_url=base_url)
 
 system_prompt = '''
